@@ -15,6 +15,8 @@ namespace ContosoUniversity.Models
 
         public string FirstName { get; set; }
 
+        public string Phone { get; set; }
+
         public DateTime EnrollmentDate { get; set; }
 
         public virtual ICollection<Enrollment> Enrollments { get; set; }

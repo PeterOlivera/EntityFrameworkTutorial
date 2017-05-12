@@ -7,7 +7,7 @@ using System.Web;
 
 namespace ContosoUniversity.DAL
 {
-    public class SchoolInitializer : DropCreateDatabaseIfModelChanges<SchoolContext> 
+    public class SchoolInitializer : DropCreateDatabaseAlways<SchoolContext> 
     {
         protected override void Seed(SchoolContext context)
         {
@@ -22,14 +22,14 @@ namespace ContosoUniversity.DAL
         {
             var students = new List<Student>
             {
-                new Student{FirstName="Carson", LastName="Alexander", EnrollmentDate=DateTime.Parse("2005-09-01")},
-                new Student{FirstName="Meredith",LastName="Alonso",EnrollmentDate=DateTime.Parse("2002-09-01")},
-                new Student{FirstName="Arturo",LastName="Anand",EnrollmentDate=DateTime.Parse( "2003-09-01")},
-                new Student{FirstName="Gytis",LastName="Barzdukas",EnrollmentDate=DateTime.Parse("2002-09-01")},
-                new Student{FirstName="Yan",LastName="Li",EnrollmentDate=DateTime.Parse("2002-09-01")},
-                new Student{FirstName="Peggy",LastName="Justice",EnrollmentDate=DateTime.Parse ("2001-09-01")},
-                new Student{FirstName="Laura",LastName="Norman",EnrollmentDate=DateTime.Parse( "2003-09-01")},
-                new Student{FirstName="Nino",LastName="Olivetto",EnrollmentDate=DateTime.Parse ("2005-09-01")}
+                new Student{FirstName="Carson", LastName="Alexander", Phone="555-555-5555", EnrollmentDate=DateTime.Parse("2005-09-01")},
+                new Student{FirstName="Meredith", LastName="Alonso", Phone="555-555-5555", EnrollmentDate=DateTime.Parse("2002-09-01")},
+                new Student{FirstName="Arturo", LastName="Anand", Phone="555-555-5555", EnrollmentDate=DateTime.Parse( "2003-09-01")},
+                new Student{FirstName="Gytis", LastName="Barzdukas", Phone="555-555-5555", EnrollmentDate=DateTime.Parse("2002-09-01")},
+                new Student{FirstName="Yan", LastName="Li", Phone="555-555-5555", EnrollmentDate=DateTime.Parse("2002-09-01")},
+                new Student{FirstName="Peggy", LastName="Justice", Phone="555-555-5555", EnrollmentDate=DateTime.Parse ("2001-09-01")},
+                new Student{FirstName="Laura", LastName="Norman", Phone="555-555-5555", EnrollmentDate=DateTime.Parse( "2003-09-01")},
+                new Student{FirstName="Nino", LastName="Olivetto", Phone="555-555-5555", EnrollmentDate=DateTime.Parse ("2005-09-01")}
             };
 
             students.ForEach(s => context.Students.Add(s));
