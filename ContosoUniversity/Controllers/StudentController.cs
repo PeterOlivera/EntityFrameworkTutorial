@@ -9,6 +9,8 @@ using System.Web;
 using System.Web.Mvc;
 using ContosoUniversity.DAL;
 using ContosoUniversity.Models;
+using PagedList;
+using PagedList.EntityFramework;
 
 namespace ContosoUniversity.Controllers
 {
@@ -17,22 +19,34 @@ namespace ContosoUniversity.Controllers
         private SchoolContext db = new SchoolContext();
 
         // GET: Student
-        public async Task<ActionResult> Index(string sortOrder, string searchString)
+        public async Task<ActionResult> Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
-            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewBag.DateSortParm = sortOrder == "date" ? "date_desc" : "date";
+
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
 
             //var students = from s in db.Students select s;
             var students = db.Students.Select(s => s);
 
-            if (!String.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(searchString))
             {
                 string lookingFor = searchString.ToUpper();
-                students = students.Where(s => s.LastName.ToUpper().Contains(lookingFor) 
+                students = students.Where(s => s.LastName.ToUpper().Contains(lookingFor)
                                             || s.FirstName.ToUpper().Contains(lookingFor)
                                             || s.MiddleName.ToUpper().Contains(lookingFor));
             }
-            
+
             switch (sortOrder)
             {
                 case "name_desc":
@@ -48,7 +62,11 @@ namespace ContosoUniversity.Controllers
                     students = students.OrderBy(s => s.LastName);
                     break;
             }
-            return View(await students.ToListAsync());
+
+            int pageSize = 3;
+            int pageNumber = (page ?? 1);
+
+            return View(await students.ToPagedListAsync(pageNumber, pageSize));
         }
 
         // GET: Student/Details/5
