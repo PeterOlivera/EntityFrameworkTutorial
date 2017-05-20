@@ -17,13 +17,22 @@ namespace ContosoUniversity.Controllers
         private SchoolContext db = new SchoolContext();
 
         // GET: Student
-        public async Task<ActionResult> Index(string sortOrder)
+        public async Task<ActionResult> Index(string sortOrder, string searchString)
         {
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewBag.DateSortParm = sortOrder == "date" ? "date_desc" : "date";
 
             //var students = from s in db.Students select s;
             var students = db.Students.Select(s => s);
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                string lookingFor = searchString.ToUpper();
+                students = students.Where(s => s.LastName.ToUpper().Contains(lookingFor) 
+                                            || s.FirstName.ToUpper().Contains(lookingFor)
+                                            || s.MiddleName.ToUpper().Contains(lookingFor));
+            }
+            
             switch (sortOrder)
             {
                 case "name_desc":
