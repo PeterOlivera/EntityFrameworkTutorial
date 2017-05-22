@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ContosoUniversity.DAL;
+using ContosoUniversity.Models;
+using PagedList.EntityFramework;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Net;
-using System.Web;
+using System.Threading.Tasks;
 using System.Web.Mvc;
-using ContosoUniversity.DAL;
-using ContosoUniversity.Models;
-using PagedList;
-using PagedList.EntityFramework;
+
 
 namespace ContosoUniversity.Controllers
 {
@@ -107,7 +105,7 @@ namespace ContosoUniversity.Controllers
                 }
             }
 
-            catch (DataException /* dex */)
+            catch (RetryLimitExceededException /* dex */)
             {
                 //Log the error (uncomment dex variable name and add a line here to write a log.         
                 ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
@@ -147,7 +145,7 @@ namespace ContosoUniversity.Controllers
                     return RedirectToAction("Index");
                 }
             }
-            catch (DataException /* dex */)
+            catch (RetryLimitExceededException /* dex */)
             {
                 //Log the error (uncomment dex variable name and add a line here to write a log.       
                 ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
@@ -192,7 +190,7 @@ namespace ContosoUniversity.Controllers
 
                 await db.SaveChangesAsync();
             }
-            catch (DataException/* dex */)
+            catch (RetryLimitExceededException/* dex */)
             {
                 //Log the error (uncomment dex variable name and add a line here to write a log.         
                 return RedirectToAction("Delete", new { id = id, saveChangesError = true });
