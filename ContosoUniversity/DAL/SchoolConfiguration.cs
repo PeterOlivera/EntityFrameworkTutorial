@@ -8,6 +8,10 @@ namespace ContosoUniversity.DAL
         public SchoolConfiguration()
         {
             SetExecutionStrategy("System.Data.SqlClient", () => new SqlAzureExecutionStrategy());
+
+            // Intrceptos can be added here, currently they are been added on Global.asax
+            //DbInterception.Add(new SchoolInterceptorTransientErrors());
+            //DbInterception.Add(new SchoolInterceptorLogging());
         }
     }
 }
