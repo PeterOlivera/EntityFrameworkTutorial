@@ -2,13 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Web;
 
 namespace ContosoUniversity.DAL
 {
-    public class SchoolInitializer : DropCreateDatabaseAlways<SchoolContext> 
+    public class SchoolInitializer : DropCreateDatabaseIfModelChanges<SchoolContext> 
     {
+        // Other possible base classes for testing: DropCreateDatabaseAlways
+
         protected override void Seed(SchoolContext context)
         {
             CreateStudents(context);
