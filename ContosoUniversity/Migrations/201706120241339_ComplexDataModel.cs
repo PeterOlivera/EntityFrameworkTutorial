@@ -57,7 +57,11 @@ namespace ContosoUniversity.Migrations
                 .Index(t => t.CourseID)
                 .Index(t => t.InstructorID);
 
-            AddColumn("dbo.Course", "DepartmentID", c => c.Int(nullable: false));
+            // Create  a department for course to point to.     
+            Sql("INSERT INTO dbo.Department (Name, Budget, StartDate) VALUES ('Temp', 0.00, GETDATE())");
+            //  default value for FK points to department created above.     
+            AddColumn("dbo.Course", "DepartmentID", c => c.Int(nullable: false, defaultValue: 1));
+            //AddColumn("dbo.Course", "DepartmentID", c => c.Int(nullable: false));
             AlterColumn("dbo.Course", "Title", c => c.String(maxLength: 50));
             AlterColumn("dbo.Student", "LastName", c => c.String(nullable: false, maxLength: 50));
             AlterColumn("dbo.Student", "FirstName", c => c.String(nullable: false, maxLength: 50));
