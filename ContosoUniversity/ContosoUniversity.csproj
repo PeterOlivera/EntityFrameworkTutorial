@@ -176,6 +176,10 @@
     <Compile Include="Migrations\201706080256585_MaxLengthOnNames.Designer.cs">
       <DependentUpon>201706080256585_MaxLengthOnNames.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201706120241339_ComplexDataModel.cs" />
+    <Compile Include="Migrations\201706120241339_ComplexDataModel.Designer.cs">
+      <DependentUpon>201706120241339_ComplexDataModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Course.cs" />
     <Compile Include="Models\Department.cs" />
@@ -255,6 +259,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201706080256585_MaxLengthOnNames.resx">
       <DependentUpon>201706080256585_MaxLengthOnNames.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706120241339_ComplexDataModel.resx">
+      <DependentUpon>201706120241339_ComplexDataModel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -10,6 +10,7 @@ namespace ContosoUniversity.Migrations
 
     internal sealed class Configuration : DbMigrationsConfiguration<SchoolContext>
     {
+        //TODO: Add a Migration and Update the Database page 155
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
