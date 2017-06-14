@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Mvc;
 using ContosoUniversity.DAL;
 using ContosoUniversity.Models;
+using ContosoUniversity.ViewModels;
 
 namespace ContosoUniversity.Controllers
 {
@@ -17,10 +18,41 @@ namespace ContosoUniversity.Controllers
         private SchoolContext db = new SchoolContext();
 
         // GET: Instructor
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(int? id, int? courseID)
         {
             var instructors = db.Instructors.Include(i => i.OfficeAssignment);
-            return View(await instructors.ToListAsync());
+
+            var viewModel = new InstructorIndexData();
+            viewModel.Instructors = db.Instructors.Include(i => i.OfficeAssignment)
+                                                  .Include(i => i.Courses.Select(c => c.Department))
+                                                  .OrderBy(i => i.LastName);
+            
+            if (id != null)
+            {
+                ViewBag.InstructorID = id.Value;
+                viewModel.Courses = viewModel.Instructors.Where(i => i.ID == id.Value).Single().Courses;
+            }
+
+            if (courseID != null)
+            {
+                ViewBag.CourseID = courseID.Value;
+                // Lazy loading  
+                //viewModel.Enrollments = viewModel.Courses.Where(x => x.CourseID == courseID)
+                //                                 .Single().Enrollments;
+
+                // Explicit loading
+                var selectedCourse = viewModel.Courses.Where(x => x.CourseID == courseID).Single();
+                db.Entry(selectedCourse).Collection(x => x.Enrollments).Load();
+
+                foreach (Enrollment enrollment in selectedCourse.Enrollments)
+                {
+                    db.Entry(enrollment).Reference(x => x.Student).Load();
+                }
+
+                viewModel.Enrollments = selectedCourse.Enrollments;
+            }
+
+            return View(await viewModel.GetAsync());
         }
 
         // GET: Instructor/Details/5
