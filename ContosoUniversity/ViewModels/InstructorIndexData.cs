@@ -12,10 +12,7 @@ namespace ContosoUniversity.ViewModels
 
         public async Task<InstructorIndexData> GetAsync()
         {
-            return await Task.Run(() =>
-            {
-                 return this;
-            });
+            return await Task.FromResult(this);
         }
     }
 }
