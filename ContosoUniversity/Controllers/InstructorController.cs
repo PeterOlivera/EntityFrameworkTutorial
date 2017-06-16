@@ -20,13 +20,21 @@ namespace ContosoUniversity.Controllers
         // GET: Instructor
         public async Task<ActionResult> Index(int? id, int? courseID)
         {
+            Task<InstructorIndexData> GetInstructorData = Task.Run(() => InitializeInstructorViewModel(id, courseID));
+
+            return View(await GetInstructorData);
+        }
+
+        private InstructorIndexData InitializeInstructorViewModel(int? id, int? courseID)
+        {
+            var viewModel = new InstructorIndexData();
+
             var instructors = db.Instructors.Include(i => i.OfficeAssignment);
 
-            var viewModel = new InstructorIndexData();
             viewModel.Instructors = db.Instructors.Include(i => i.OfficeAssignment)
                                                   .Include(i => i.Courses.Select(c => c.Department))
                                                   .OrderBy(i => i.LastName);
-            
+
             if (id != null)
             {
                 ViewBag.InstructorID = id.Value;
@@ -52,7 +60,7 @@ namespace ContosoUniversity.Controllers
                 viewModel.Enrollments = selectedCourse.Enrollments;
             }
 
-            return View(await viewModel.GetAsync());
+            return viewModel;
         }
 
         // GET: Instructor/Details/5
