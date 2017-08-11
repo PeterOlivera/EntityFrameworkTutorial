@@ -11,7 +11,7 @@ using ContosoUniversity.DAL;
 using ContosoUniversity.Models;
 using System.Data.Entity.Infrastructure;
 
-namespace ContosoUniversity.Controllers //TODO: Page 191
+namespace ContosoUniversity.Controllers
 {
     public class CourseController : Controller
     {
