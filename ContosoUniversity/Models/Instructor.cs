@@ -39,7 +39,18 @@ namespace ContosoUniversity.Models
             }
         }
 
-        public virtual ICollection<Course> Courses { get; set; }
+        private ICollection<Course> courses;
+        public virtual ICollection<Course> Courses
+        {
+            get
+            {
+                return courses ?? (courses = new List<Course>());
+            }
+            set
+            {
+                courses = value;
+            }
+        }
 
         public virtual OfficeAssignment OfficeAssignment { get; set; }
     }

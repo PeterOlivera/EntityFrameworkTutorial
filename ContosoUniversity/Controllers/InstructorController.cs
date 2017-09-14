@@ -14,7 +14,7 @@ using System.Data.Entity.Infrastructure;
 
 namespace ContosoUniversity.Controllers
 {
-    public class InstructorController : Controller  //TODO: Page 196 - Adding Course Assignments to the Instructor Edit Page
+    public class InstructorController : Controller  //TODO: Page 211 - Async and Stored Procedures with the Entity Framework in an ASP.NET MVC Application
     {
         private SchoolContext db = new SchoolContext();
 
@@ -82,7 +82,11 @@ namespace ContosoUniversity.Controllers
         // GET: Instructor/Create
         public ActionResult Create()
         {
-            ViewBag.ID = new SelectList(db.OfficeAssignments, "InstructorID", "Location");
+            var instructor = new Instructor();
+
+            instructor.Courses = new List<Course>();
+            PopulateAssignedCourseData(instructor);
+            
             return View();
         }
 
@@ -91,8 +95,17 @@ namespace ContosoUniversity.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "ID,LastName,MiddleName,FirstName,HireDate")] Instructor instructor)
+        public async Task<ActionResult> Create([Bind(Include = "ID,LastName,MiddleName,FirstName,HireDate,OfficeAssignment")] Instructor instructor, string[] selectedCourses)
         {
+            if (selectedCourses != null)
+            {
+                foreach (var course in selectedCourses)
+                {
+                    var courseToAdd = await db.Courses.FindAsync(int.Parse(course));
+                    instructor.Courses.Add(courseToAdd);
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 db.Instructors.Add(instructor);
@@ -100,7 +113,8 @@ namespace ContosoUniversity.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.ID = new SelectList(db.OfficeAssignments, "InstructorID", "Location", instructor.ID);
+            PopulateAssignedCourseData(instructor);
+
             return View(instructor);
         }
 
@@ -111,12 +125,37 @@ namespace ContosoUniversity.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Instructor instructor = db.Instructors.Include(i => i.OfficeAssignment).Where(i => i.ID == id).Single();
+            Instructor instructor = db.Instructors
+                .Include(i => i.OfficeAssignment)
+                .Include(i => i.Courses)
+                .Where(i => i.ID == id)
+                .Single();
+
+            PopulateAssignedCourseData(instructor);
+
             if (instructor == null)
             {
                 return HttpNotFound();
             }
             return View(instructor);
+        }
+
+        private void PopulateAssignedCourseData(Instructor instructor)
+        {
+            var allCourses = db.Courses;
+            var instructorCourses = new HashSet<int>(instructor.Courses.Select(c => c.CourseID));
+            var viewModel = new List<AssignedCourseData>();
+
+            foreach (var course in allCourses)
+            {
+                viewModel.Add(new AssignedCourseData
+                {
+                    CourseID = course.CourseID,
+                    Title = course.Title,
+                    Assigned = instructorCourses.Contains(course.CourseID)
+                });
+            }
+            ViewBag.Courses = viewModel;
         }
 
         // POST: Instructor/Edit/5
@@ -139,15 +178,21 @@ namespace ContosoUniversity.Controllers
         // POST: Instructor/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost, ActionName("Edit")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditPost([Bind(Include = "ID,LastName,MiddleName,FirstName,HireDate,OfficeAssignment")] int? id)
+        public async Task<ActionResult> Edit([Bind(Include = "ID,LastName,MiddleName,FirstName,HireDate,OfficeAssignment")] int? id, string[] selectedCourses)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var instructorToUpdate = db.Instructors.Include(i => i.OfficeAssignment).Where(i => i.ID == id).Single();
+
+            var instructorToUpdate = db.Instructors
+                .Include(i => i.OfficeAssignment)
+                .Include(i => i.Courses)
+                .Where(i => i.ID == id)
+                .Single();
+
             if (TryUpdateModel(instructorToUpdate, "", new string[] { "LastName", "MiddleName", "FirstName", "HireDate", "OfficeAssignment" }))
             {
                 try
@@ -156,6 +201,8 @@ namespace ContosoUniversity.Controllers
                     {
                         instructorToUpdate.OfficeAssignment = null;
                     }
+
+                    UpdateInstructorCourses(selectedCourses, instructorToUpdate);
 
                     db.Entry(instructorToUpdate).State = EntityState.Modified;
                     await db.SaveChangesAsync();
@@ -168,7 +215,39 @@ namespace ContosoUniversity.Controllers
                     ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
                 }
             }
+
+            PopulateAssignedCourseData(instructorToUpdate);
+
             return View(instructorToUpdate);
+        }
+
+        private void UpdateInstructorCourses(string[] selectedCourses, Instructor instructorToUpdate)
+        {
+            if (selectedCourses == null)
+            {
+                instructorToUpdate.Courses = new List<Course>();
+                return;
+            }
+            var selectedCoursesHS = new HashSet<string>(selectedCourses);
+            var instructorCourses = new HashSet<int>(instructorToUpdate.Courses.Select(c => c.CourseID));
+
+            foreach (var course in db.Courses)
+            {
+                if (selectedCoursesHS.Contains(course.CourseID.ToString()))
+                {
+                    if (!instructorCourses.Contains(course.CourseID))
+                    {
+                        instructorToUpdate.Courses.Add(course);
+                    }
+                }
+                else
+                {
+                    if (instructorCourses.Contains(course.CourseID))
+                    {
+                        instructorToUpdate.Courses.Remove(course);
+                    }
+                }
+            }
         }
 
         // GET: Instructor/Delete/5
@@ -191,8 +270,18 @@ namespace ContosoUniversity.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
-            Instructor instructor = await db.Instructors.FindAsync(id);
+            //Instructor instructor = await db.Instructors.FindAsync(id);
+            Instructor instructor = db.Instructors.Include(i => i.OfficeAssignment).Where(i => i.ID == id).Single();
+
+            instructor.OfficeAssignment = null; 
             db.Instructors.Remove(instructor);
+
+            var department = db.Departments.Where(d => d.InstructorID == id).SingleOrDefault();
+            if (department != null)
+            {
+                department.InstructorID = null;
+            }
+
             await db.SaveChangesAsync();
             return RedirectToAction("Index");
         }
