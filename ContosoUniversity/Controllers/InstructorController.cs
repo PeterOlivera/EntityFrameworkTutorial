@@ -14,7 +14,7 @@ using System.Data.Entity.Infrastructure;
 
 namespace ContosoUniversity.Controllers
 {
-    public class InstructorController : Controller  //TODO: Page 211 - Async and Stored Procedures with the Entity Framework in an ASP.NET MVC Application
+    public class InstructorController : Controller
     {
         private SchoolContext db = new SchoolContext();
 
