@@ -8,7 +8,7 @@ using System.Web;
 
 namespace ContosoUniversity.DAL
 {
-    public class SchoolContext : DbContext
+    public class SchoolContext : DbContext  
     {
         public SchoolContext() : base("SchoolContext") { }
 
@@ -29,6 +29,8 @@ namespace ContosoUniversity.DAL
                 .Map(t => t.MapLeftKey("CourseID")
                 .MapRightKey("InstructorID")
                 .ToTable("CourseInstructor"));
+
+            modelBuilder.Entity<Department>().MapToStoredProcedures();
         }
     }
 }
