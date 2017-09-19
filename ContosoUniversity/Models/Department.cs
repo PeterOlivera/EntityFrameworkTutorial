@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ContosoUniversity.Models
 {
-    public class Department
+    public class Department //TODO: Handling Concurrency with the Entity Framework 6, page 224
     {
         public int DepartmentID { get; set; }
 
@@ -21,7 +21,11 @@ namespace ContosoUniversity.Models
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
 
+        [Display(Name = "Administrator")]
         public int? InstructorID { get; set; }
+
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
 
         public virtual Instructor Administrator { get; set; }
 
