@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ContosoUniversity.Models
 {
-    public class Department //TODO: Handling Concurrency with the Entity Framework 6, page 224
+    public class Department //TODO: Handling Concurrency with the Entity Framework 6, page 241
     {
         public int DepartmentID { get; set; }
 
