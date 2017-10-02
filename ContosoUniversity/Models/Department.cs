@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ContosoUniversity.Models
 {
-    public class Department //TODO: Handling Concurrency with the Entity Framework 6, page 241
+    public class Department //TODO: Implementing Inheritance with the Entity Framework 6 in an ASP.NET MVC 5, page 250
     {
         public int DepartmentID { get; set; }
 
